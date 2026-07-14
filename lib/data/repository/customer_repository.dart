@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../model/customer.dart';
 import '../local/database_helper.dart';
@@ -12,7 +13,7 @@ class CustomerRepository {
       final remoteCustomers = response.map((json) => Customer.fromMap(json)).toList();
       return remoteCustomers;
     } catch (e) {
-      print('Customer Fetch Error: $e');
+      debugPrint('Customer Fetch Error: $e');
       return await _dbHelper.getAllCustomers();
     }
   }
@@ -26,7 +27,7 @@ class CustomerRepository {
       finalCustomer = Customer.fromMap(response);
       await _dbHelper.insertCustomer(finalCustomer);
     } catch (e) {
-      print('Supabase addCustomer error: $e');
+      debugPrint('Supabase addCustomer error: $e');
       final id = await _dbHelper.insertCustomer(customer);
       finalCustomer = Customer(id: id, name: customer.name, phone: customer.phone, address: customer.address);
     }
@@ -43,7 +44,7 @@ class CustomerRepository {
       }).eq('id', customer.id!);
       await _dbHelper.updateCustomer(customer);
     } catch (e) {
-      print('Supabase updateCustomer error: $e');
+      debugPrint('Supabase updateCustomer error: $e');
       await _dbHelper.updateCustomer(customer);
     }
   }
@@ -54,7 +55,7 @@ class CustomerRepository {
       await _supabase.from('customers').delete().eq('id', id);
       await _dbHelper.deleteCustomer(id);
     } catch (e) {
-      print('Supabase deleteCustomer error: $e');
+      debugPrint('Supabase deleteCustomer error: $e');
       await _dbHelper.deleteCustomer(id);
     }
   }
@@ -71,7 +72,7 @@ class CustomerRepository {
           .limit(1);
       return (response as List).isNotEmpty;
     } catch (e) {
-      print('hasPayments error: $e');
+      debugPrint('hasPayments error: $e');
       return await _dbHelper.hasPaymentsForCustomer(customerId);
     }
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../model/scheme.dart';
 import '../local/database_helper.dart';
@@ -11,7 +12,7 @@ class SchemeRepository {
       final response = await _supabase.from('schemes').select().eq('customer_id', customerId);
       return response.map((json) => Scheme.fromMap(json)).toList();
     } catch (e) {
-      print('Scheme Fetch Error: $e');
+      debugPrint('Scheme Fetch Error: $e');
       return await _dbHelper.getSchemesForCustomer(customerId);
     }
   }
@@ -36,7 +37,7 @@ class SchemeRepository {
       
       await _dbHelper.insertScheme(finalScheme);
     } catch (e) {
-      print('Supabase addScheme error: $e');
+      debugPrint('Supabase addScheme error: $e');
       final id = await _dbHelper.insertScheme(scheme);
       finalScheme = Scheme(
         id: id,
@@ -64,7 +65,7 @@ class SchemeRepository {
     try {
       await _supabase.from('schemes').update(updateData).eq('id', schemeId);
     } catch (e) {
-      print('Update scheme status error: $e');
+      debugPrint('Update scheme status error: $e');
       rethrow;
     }
     try {
@@ -76,7 +77,7 @@ class SchemeRepository {
     try {
       await _supabase.from('schemes').delete().eq('id', schemeId);
     } catch (e) {
-      print('Delete scheme error: $e');
+      debugPrint('Delete scheme error: $e');
     }
     try {
       await _dbHelper.deleteScheme(schemeId);
@@ -90,7 +91,7 @@ class SchemeRepository {
         'created_at': createdAt,
       }).eq('id', schemeId);
     } catch (e) {
-      print('Update scheme error: $e');
+      debugPrint('Update scheme error: $e');
     }
     try {
       await _dbHelper.updateScheme(schemeId, monthlyAmount, createdAt);
@@ -104,7 +105,7 @@ class SchemeRepository {
         'last_payment_date': lastPaymentDate,
       }).eq('id', schemeId);
     } catch (e) {
-      print('Update scheme totals error: $e');
+      debugPrint('Update scheme totals error: $e');
     }
     // Also update SQLite locally if needed
   }

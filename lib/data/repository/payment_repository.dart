@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:io';
 import '../model/payment.dart';
@@ -12,7 +13,7 @@ class PaymentRepository {
       final response = await _supabase.from('payments').select().eq('scheme_id', schemeId);
       return response.map((json) => Payment.fromMap(json)).toList();
     } catch (e) {
-      print('Payment Fetch Error: $e');
+      debugPrint('Payment Fetch Error: $e');
       return await _dbHelper.getPaymentsForScheme(schemeId);
     }
   }
@@ -47,7 +48,7 @@ class PaymentRepository {
       // Update local SQLite with the true Supabase ID
       await _dbHelper.insertPayment(finalPayment);
     } catch (e, stacktrace) {
-      print('Supabase addPayment error: $e');
+      debugPrint('Supabase addPayment error: $e');
       try {
         File('supabase_error.txt').writeAsStringSync('Error: $e\n$stacktrace');
       } catch(_) {}
@@ -75,7 +76,7 @@ class PaymentRepository {
       await _supabase.from('payments').update(updateMap).eq('id', payment.id!);
       // ignore missing local update for now if it doesn't exist
     } catch (e) {
-      print('Supabase updatePayment error: $e');
+      debugPrint('Supabase updatePayment error: $e');
     }
   }
 
@@ -84,7 +85,7 @@ class PaymentRepository {
       await _supabase.from('payments').delete().eq('id', id);
       // ignore missing local delete for now if it doesn't exist
     } catch (e) {
-      print('Supabase deletePayment error: $e');
+      debugPrint('Supabase deletePayment error: $e');
     }
   }
 }
