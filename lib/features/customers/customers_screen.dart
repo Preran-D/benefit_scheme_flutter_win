@@ -1298,7 +1298,7 @@ class _SchemeCard extends ConsumerWidget {
                   ),
                   const SizedBox(width: 8),
                   // Close scheme button
-                  if (!isClosedOrCompleted && paymentCount > 0) ...[
+                  if (status != 'closed' && paymentCount > 0) ...[
                     _SchemeActionButton(
                       icon: Icons.block_rounded,
                       label: 'Close',
@@ -1310,7 +1310,7 @@ class _SchemeCard extends ConsumerWidget {
                         
                         final freshScheme = schemes.firstWhere((s) => s.id == scheme.id, orElse: () => scheme);
                         final freshStatus = (freshScheme.status ?? 'active').toLowerCase();
-                        if (freshStatus == 'closed' || freshStatus == 'completed') {
+                        if (freshStatus == 'closed') {
                           if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cannot close: This scheme is already closed.')));
                           return;
                         }
