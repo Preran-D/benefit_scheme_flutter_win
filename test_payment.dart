@@ -1,0 +1,32 @@
+import 'package:flutter/widgets.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'lib/data/model/payment.dart';
+import 'lib/data/model/payment_mode.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+  );
+  final supabase = Supabase.instance.client;
+  final payment = Payment(
+    schemeId: 104, // use an existing scheme id
+    amount: 500,
+    paymentModes: [PaymentMode.cash],
+    paymentDate: DateTime.now().toIso8601String(),
+  );
+  
+  final insertMap = payment.toMap();
+  insertMap.remove('id');
+  print('Trying to insert: $insertMap');
+  
+  try {
+    final response = await supabase.from('payments').insert(insertMap).select().single();
+    print('Success: $response');
+  } catch (e) {
+    print('ERROR: $e');
+  }
+}
