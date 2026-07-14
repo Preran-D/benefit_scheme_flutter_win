@@ -22,6 +22,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Create .env file
+        run: |
+          echo "SUPABASE_URL=https://gcgbqvvqemttbexvzkme.supabase.co" > .env
+          echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjZ2JxdnZxZW10dGJleHZ6a21lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwNjcwNDEsImV4cCI6MjA3MDY0MzA0MX0.-dbxe51JxXZVTekNnBSGYKOUUJTm1PJIGV9TYRTz4jU" >> .env
+          echo "GOOGLE_CLIENT_ID=524182354123-039shiqoq9kat1cujmbo91h7dk7crd5l.apps.googleusercontent.com" >> .env
+
       - name: Enable Windows Desktop Build
         run: flutter config --enable-windows-desktop
 
