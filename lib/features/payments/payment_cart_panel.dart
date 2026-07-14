@@ -54,9 +54,10 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
           return;
         }
         
-        final newTotalPaid = (freshScheme.totalPaid ?? 0.0) + (item.scheme.monthlyAmount * item.months);
-        if (newTotalPaid > (item.scheme.monthlyAmount * 12)) {
-          if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cannot process: Payment for Scheme #${item.scheme.id} exceeds total allowed amount.')));
+        final payments = await ref.read(schemePaymentsProvider(item.scheme.id!).future);
+        final existingPayments = payments.length;
+        if (existingPayments + item.months > 12) {
+          if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cannot process: Payment for Scheme #${item.scheme.id} exceeds total allowed limit of 12 payments.')));
           return;
         }
       }
@@ -64,17 +65,19 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
       final repo = ref.read(paymentRepositoryProvider);
       
       for (final item in cartItems) {
-        final amount = item.scheme.monthlyAmount * item.months;
-        final newPayment = Payment(
-          schemeId: item.scheme.id!,
-          amount: amount,
-          paymentModes: _selectedModes.toList(),
-          paymentDate: _paymentDate.toIso8601String(),
-          notes: 'Months paid: ${item.months}',
-          createdAt: DateTime.now().toIso8601String(),
-          updatedAt: DateTime.now().toIso8601String(),
-        );
-        await repo.addPayment(newPayment);
+        final amount = item.scheme.monthlyAmount;
+        for (int i = 0; i < item.months; i++) {
+          final newPayment = Payment(
+            schemeId: item.scheme.id!,
+            amount: amount,
+            paymentModes: _selectedModes.toList(),
+            paymentDate: _paymentDate.toIso8601String(),
+            notes: item.months > 1 ? 'Month ${i + 1} of ${item.months} paid' : null,
+            createdAt: DateTime.now().toIso8601String(),
+            updatedAt: DateTime.now().toIso8601String(),
+          );
+          await repo.addPayment(newPayment);
+        }
       }
 
       ref.read(cartProvider.notifier).clearCart();
