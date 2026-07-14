@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -26,6 +27,6 @@ void main() async {
 
   final response = await request.close();
   final responseBody = await response.transform(utf8.decoder).join();
-  print('Status: ${response.statusCode}');
-  print('Response: $responseBody');
+  debugPrint('Status: ${response.statusCode}');
+  debugPrint('Response: $responseBody');
 }
