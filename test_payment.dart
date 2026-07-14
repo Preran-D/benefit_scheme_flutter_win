@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'lib/data/model/payment.dart';
@@ -20,7 +21,6 @@ void main() async {
 
   final insertMap = payment.toMap();
   insertMap.remove('id');
-  print('Trying to insert: $insertMap');
 
   try {
     final response = await supabase
@@ -28,8 +28,8 @@ void main() async {
         .insert(insertMap)
         .select()
         .single();
-    print('Success: $response');
+    debugPrint('Success: $response');
   } catch (e) {
-    print('ERROR: $e');
+    debugPrint('ERROR: $e');
   }
 }
