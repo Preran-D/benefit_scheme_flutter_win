@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'lib/data/model/payment.dart';
@@ -19,15 +17,19 @@ void main() async {
     paymentModes: [PaymentMode.cash],
     paymentDate: DateTime.now().toIso8601String(),
   );
-  
+
   final insertMap = payment.toMap();
   insertMap.remove('id');
-  debugPrint('Trying to insert: $insertMap');
-  
+  print('Trying to insert: $insertMap');
+
   try {
-    final response = await supabase.from('payments').insert(insertMap).select().single();
-    debugPrint('Success: $response');
+    final response = await supabase
+        .from('payments')
+        .insert(insertMap)
+        .select()
+        .single();
+    print('Success: $response');
   } catch (e) {
-    debugPrint('ERROR: $e');
+    print('ERROR: $e');
   }
 }

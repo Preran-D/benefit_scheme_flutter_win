@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'payment_mode.dart';
 
 class Payment {
@@ -53,7 +54,7 @@ class Payment {
         updatedAt: map['updated_at'] as String?,
       );
     } catch (e) {
-      print('Payment.fromMap crash on map: $map');
+      debugPrint('Payment.fromMap crash on map: $map');
       rethrow;
     }
   }

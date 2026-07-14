@@ -132,10 +132,13 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                       if (_selectedAddresses.isNotEmpty) const SizedBox(width: 16),
                       ElevatedButton.icon(
                         onPressed: () {
-                          Future.delayed(Duration.zero, () => showDialog(
-                            context: context,
-                            builder: (context) => const AddCustomerDialog(),
-                          ));
+                          Future.delayed(Duration.zero, () {
+                            if (!context.mounted) return;
+                            showDialog(
+                              context: context,
+                              builder: (context) => const AddCustomerDialog(),
+                            );
+                          });
                         },
                         icon: const Icon(Icons.person_add, size: 18),
                         label: const Text('Add Customer', style: TextStyle(fontWeight: FontWeight.w600)),
@@ -232,6 +235,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                                     onRecordPaymentRequested: (scheme) {
                                       Future.delayed(Duration.zero, () {
                                         ref.read(cartProvider.notifier).addScheme(_selectedCustomer!, scheme);
+                                        if (!context.mounted) return;
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(content: Text('Scheme added to cart!')),
                                         );
@@ -569,10 +573,13 @@ class _CustomerSchemesPanel extends ConsumerWidget {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  Future.delayed(Duration.zero, () => showDialog(
-                    context: context, 
-                    builder: (_) => AddSchemeDialog(customer: customer)
-                  ));
+                  Future.delayed(Duration.zero, () {
+                    if (!context.mounted) return;
+                    showDialog(
+                      context: context, 
+                      builder: (_) => AddSchemeDialog(customer: customer)
+                    );
+                  });
                 },
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text('Add Scheme'),
@@ -1656,10 +1663,13 @@ class _CustomerActionMenuState extends ConsumerState<_CustomerActionMenu> {
       splashRadius: 20,
       onSelected: (value) {
         if (value == 'edit') {
-          Future.delayed(Duration.zero, () => showDialog(
-            context: context,
-            builder: (context) => AddCustomerDialog(editingCustomer: widget.customer),
-          ));
+          Future.delayed(Duration.zero, () {
+            if (!context.mounted) return;
+            showDialog(
+              context: context,
+              builder: (context) => AddCustomerDialog(editingCustomer: widget.customer),
+            );
+          });
         } else if (value == 'delete') {
           _confirmAndDelete();
         }
