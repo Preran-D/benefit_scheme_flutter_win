@@ -663,29 +663,6 @@ class _CustomerSchemesPanel extends ConsumerWidget {
     );
   }
 
-  Widget _buildSchemeFilterChip(BuildContext context, String label, int count, Color bgColor, Color textColor) {
-    final isSelected = schemeStatusFilter.toLowerCase() == label.toLowerCase();
-    return InkWell(
-      onTap: () => onSchemeStatusFilterChanged(label.toLowerCase()),
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? bgColor : Colors.grey[50],
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isSelected ? bgColor : Colors.grey[300]!),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(label, style: TextStyle(color: isSelected ? textColor : Colors.black87, fontWeight: FontWeight.bold)),
-            const SizedBox(width: 6),
-            Text('$count', style: TextStyle(color: isSelected ? textColor : Colors.black54, fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 /// Small icon + label action button used in scheme list rows.

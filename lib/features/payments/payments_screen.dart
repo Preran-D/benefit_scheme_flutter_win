@@ -182,9 +182,6 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
       return dt.year == _selectedDate.year && dt.month == _selectedDate.month && dt.day == _selectedDate.day;
     }).toList();
 
-    final primaryColor = Theme.of(context).colorScheme.primary;
-    final totalAmount = filtered.fold(0.0, (sum, p) => sum + p.amount);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
