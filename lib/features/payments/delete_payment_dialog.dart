@@ -41,6 +41,7 @@ class _DeletePaymentDialogState extends ConsumerState<DeletePaymentDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       backgroundColor: Colors.grey[50],

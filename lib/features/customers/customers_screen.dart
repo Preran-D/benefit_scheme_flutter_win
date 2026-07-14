@@ -303,7 +303,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
     );
   }
   Widget _buildCustomerTab() {
-    ref.watch(customersProvider);
+    final customersAsyncValue = ref.watch(customersProvider);
     return customersAsyncValue.when(
       data: (customers) {
         final filtered = customers.where((c) => 
@@ -381,7 +381,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
   }
 
   Widget _buildAddressTab() {
-    ref.watch(customersProvider);
+    final customersAsyncValue = ref.watch(customersProvider);
     final allSchemesAsync = ref.watch(allSchemesProvider);
     
     return customersAsyncValue.when(
