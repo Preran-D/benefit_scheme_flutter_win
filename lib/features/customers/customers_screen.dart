@@ -6,8 +6,6 @@ import '../../data/model/customer.dart';
 import '../../data/model/scheme.dart';
 import '../../providers/providers.dart';
 import '../payments/payment_cart_panel.dart';
-import '../payments/confirm_payment_dialog.dart';
-import '../../data/model/payment.dart';
 import 'add_customer_screen.dart'; 
 import '../schemes/add_scheme_screen.dart'; 
 import '../schemes/print_preview_dialog.dart';
@@ -23,7 +21,7 @@ class CustomerItem extends ListItem {
 }
 
 class CustomersScreen extends ConsumerStatefulWidget {
-  const CustomersScreen({Key? key}) : super(key: key);
+  const CustomersScreen({super.key});
 
   @override
   ConsumerState<CustomersScreen> createState() => _CustomersScreenState();
@@ -80,7 +78,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
   Widget build(BuildContext context) {
     final cartItems = ref.watch(cartProvider);
     final totalAmount = ref.read(cartProvider.notifier).totalAmount;
-    final customersAsyncValue = ref.watch(customersProvider);
+    ref.watch(customersProvider);
 
     return Scaffold(
       backgroundColor: Colors.transparent, // Inherit from MainScreen
@@ -214,7 +212,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                             
                             // Middle Column: Customer Schemes (fills remaining width)
                             if (_selectedCustomer != null)
-                              Container(
+                              SizedBox(
                                 width: isSmallScreen
                                     ? 500
                                     : constraints.maxWidth - (constraints.maxWidth * 0.40) - 12 - 24,
@@ -305,7 +303,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
     );
   }
   Widget _buildCustomerTab() {
-    final customersAsyncValue = ref.watch(customersProvider);
+    ref.watch(customersProvider);
     return customersAsyncValue.when(
       data: (customers) {
         final filtered = customers.where((c) => 
@@ -383,7 +381,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
   }
 
   Widget _buildAddressTab() {
-    final customersAsyncValue = ref.watch(customersProvider);
+    ref.watch(customersProvider);
     final allSchemesAsync = ref.watch(allSchemesProvider);
     
     return customersAsyncValue.when(
@@ -493,7 +491,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                         },
                       );
                     });
-                  }).toList(),
+                  }),
                 const Divider(height: 1, color: Color(0xFFF3F4F6)),
               ],
             );
@@ -513,12 +511,11 @@ class _CustomerSchemesPanel extends ConsumerWidget {
   final Function(Scheme) onRecordPaymentRequested;
 
   const _CustomerSchemesPanel({
-    Key? key, 
     required this.customer, 
     required this.schemeStatusFilter,
     required this.onSchemeStatusFilterChanged,
     required this.onRecordPaymentRequested,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -831,7 +828,7 @@ class _SchemeHistoryDialog extends ConsumerWidget {
                     _SkeletonChip(),
                   ],
                 ),
-                error: (_, __) => const SizedBox.shrink(),
+                error: (_, _) => const SizedBox.shrink(),
               ),
             ),
 
@@ -877,7 +874,7 @@ class _SchemeHistoryDialog extends ConsumerWidget {
                     }
                     return ListView.separated(
                       itemCount: payments.length,
-                      separatorBuilder: (_, __) => Divider(height: 1, color: const Color(0xFF8BA582).withOpacity(0.4)),
+                      separatorBuilder: (_, _) => Divider(height: 1, color: const Color(0xFF8BA582).withValues(alpha: 0.4)),
                       itemBuilder: (context, index) {
                         final payment = payments[index];
                         String formattedDate = payment.paymentDate ?? 'Unknown';
@@ -1418,7 +1415,7 @@ class _SchemeCard extends ConsumerWidget {
               );
             },
             loading: () => const SizedBox(width: 40, height: 40, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
-            error: (_, __) => const SizedBox(),
+            error: (_, _) => const SizedBox(),
           ),
         ],
       ),

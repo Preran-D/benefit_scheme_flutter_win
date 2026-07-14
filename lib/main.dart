@@ -135,7 +135,7 @@ final _router = GoRouter(
 );
 
 class BenefitSchemeApp extends StatelessWidget {
-  const BenefitSchemeApp({Key? key}) : super(key: key);
+  const BenefitSchemeApp({super.key});
 
   @override
   Widget build(BuildContext context) {

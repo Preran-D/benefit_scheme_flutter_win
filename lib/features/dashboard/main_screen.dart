@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:animations/animations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:intl/intl.dart';
@@ -39,10 +38,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   bool _manualConnecting = false;
   bool _showOnlineText = true;
   Timer? _onlineTimer;
-  bool _hasUpdate = true; // Placeholder for updates
+  final bool _hasUpdate = true; // Placeholder for updates
   bool _wasReachable = false;
 
-  int _previousIndex = 0;
 
   @override
   void dispose() {
@@ -58,7 +56,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   }
 
   void _onDestinationSelected(int index) {
-    _previousIndex = _getSelectedIndex(context);
     switch (index) {
       case 0:
         context.go('/customers');
@@ -69,13 +66,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     }
   }
   
-  String _getPageTitle(int index) {
-    switch (index) {
-      case 0: return 'Customers';
-      case 1: return 'Daybook';
-      default: return 'Overview';
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {

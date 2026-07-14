@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../data/model/customer.dart';
-import '../../data/model/scheme.dart';
 import '../../data/model/payment.dart';
 import '../../data/model/payment_mode.dart';
 import '../../providers/providers.dart';
@@ -12,10 +10,10 @@ class PaymentCartPanel extends ConsumerStatefulWidget {
   final VoidCallback onConfirm;
 
   const PaymentCartPanel({
-    Key? key,
+    super.key,
     required this.onClearAll,
     required this.onConfirm,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<PaymentCartPanel> createState() => _PaymentCartPanelState();
@@ -24,7 +22,7 @@ class PaymentCartPanel extends ConsumerStatefulWidget {
 class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
   int _step = 0;
   DateTime _paymentDate = DateTime.now();
-  Set<PaymentMode> _selectedModes = {PaymentMode.cash};
+  final Set<PaymentMode> _selectedModes = {PaymentMode.cash};
   bool _isLoading = false;
 
   Future<void> _selectDate() async {
@@ -168,7 +166,7 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       width: double.infinity,
-                      decoration: BoxDecoration(color: primaryColor.withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
+                      decoration: BoxDecoration(color: primaryColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(16)),
                       child: Column(
                         children: [
                           Text('Total Amount', style: TextStyle(color: primaryColor, fontWeight: FontWeight.w600)),
@@ -237,7 +235,7 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
                                     }
                                   });
                                 },
-                                selectedColor: primaryColor.withOpacity(0.2),
+                                selectedColor: primaryColor.withValues(alpha: 0.2),
                                 labelStyle: TextStyle(
                                   color: isSelected ? primaryColor : Colors.black87,
                                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -247,7 +245,7 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   side: BorderSide(
-                                    color: isSelected ? primaryColor.withOpacity(0.5) : Colors.transparent,
+                                    color: isSelected ? primaryColor.withValues(alpha: 0.5) : Colors.transparent,
                                   ),
                                 ),
                               );
@@ -277,7 +275,7 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Total Amount', style: TextStyle(color: primaryColor.withOpacity(0.8), fontSize: 12, fontWeight: FontWeight.bold)),
+                        Text('Total Amount', style: TextStyle(color: primaryColor.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold)),
                         Text('₹${totalAmount.toStringAsFixed(0)}', style: const TextStyle(color: Colors.black87, fontSize: 22, fontWeight: FontWeight.bold)),
                       ],
                     ),
@@ -342,7 +340,7 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
           border: Border.all(color: Colors.grey[200]!),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -402,7 +400,7 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
 
                 Container(
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.08),
+                    color: primaryColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Row(

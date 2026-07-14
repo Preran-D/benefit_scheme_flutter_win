@@ -3,6 +3,8 @@ name: Build Windows Release
 on:
   push:
     branches: [ "main", "master" ]
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -43,3 +45,11 @@ jobs:
         with:
           name: benefit_scheme_windows_release
           path: benefit_scheme_windows_release.zip
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: benefit_scheme_windows_release.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

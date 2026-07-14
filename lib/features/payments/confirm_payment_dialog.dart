@@ -10,9 +10,9 @@ class ConfirmPaymentDialog extends ConsumerStatefulWidget {
   final List<CartItem> items;
 
   const ConfirmPaymentDialog({
-    Key? key,
+    super.key,
     required this.items,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<ConfirmPaymentDialog> createState() => _ConfirmPaymentDialogState();

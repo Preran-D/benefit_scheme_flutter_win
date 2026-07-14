@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/model/scheme.dart';
-import '../../data/model/payment.dart';
 import '../../providers/providers.dart';
 
 class SchemeDetailsScreen extends ConsumerWidget {
   final Scheme scheme;
   
-  const SchemeDetailsScreen({Key? key, required this.scheme}) : super(key: key);
+  const SchemeDetailsScreen({super.key, required this.scheme});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import '../../providers/providers.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
@@ -19,7 +19,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final allSchemesAsync = ref.watch(allSchemesProvider);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.2),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Row(
@@ -41,7 +41,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                            side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(24.0),
@@ -62,7 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         );
                                       },
                                       loading: () => const Text('...', style: TextStyle(fontSize: 32)),
-                                      error: (_, __) => const Text('Error', style: TextStyle(fontSize: 32)),
+                                      error: (_, _) => const Text('Error', style: TextStyle(fontSize: 32)),
                                     ),
                                     const SizedBox(width: 8),
                                     const Text('+6.7%', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 14)),
@@ -91,7 +91,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         onPressed: () => context.push('/payments'),
                                         style: OutlinedButton.styleFrom(
                                           padding: const EdgeInsets.symmetric(vertical: 16),
-                                          side: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                                          side: BorderSide(color: Colors.grey.withValues(alpha: 0.3)),
                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                         ),
                                         child: const Text('View Payments', style: TextStyle(color: Colors.black87)),
@@ -112,14 +112,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                            side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(24.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                CircleAvatar(backgroundColor: Colors.green.withOpacity(0.1), radius: 16, child: const Icon(Icons.account_balance_wallet, color: Colors.green, size: 16)),
+                                CircleAvatar(backgroundColor: Colors.green.withValues(alpha: 0.1), radius: 16, child: const Icon(Icons.account_balance_wallet, color: Colors.green, size: 16)),
                                 const SizedBox(height: 16),
                                 const Text('Monthly Income', style: TextStyle(fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 8),
@@ -136,7 +136,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     );
                                   },
                                   loading: () => const Text('...', style: TextStyle(fontSize: 24)),
-                                  error: (_, __) => const Text('Error', style: TextStyle(fontSize: 24)),
+                                  error: (_, _) => const Text('Error', style: TextStyle(fontSize: 24)),
                                 ),
                                 const SizedBox(height: 4),
                                 const Text('+9.8% compared to last month', style: TextStyle(color: Colors.green, fontSize: 12)),
@@ -153,14 +153,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                            side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(24.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                CircleAvatar(backgroundColor: Colors.orange.withOpacity(0.1), radius: 16, child: const Icon(Icons.credit_card, color: Colors.orange, size: 16)),
+                                CircleAvatar(backgroundColor: Colors.orange.withValues(alpha: 0.1), radius: 16, child: const Icon(Icons.credit_card, color: Colors.orange, size: 16)),
                                 const SizedBox(height: 16),
                                 const Text('Active Schemes', style: TextStyle(fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 8),
@@ -172,7 +172,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     );
                                   },
                                   loading: () => const Text('...', style: TextStyle(fontSize: 24)),
-                                  error: (_, __) => const Text('Error', style: TextStyle(fontSize: 24)),
+                                  error: (_, _) => const Text('Error', style: TextStyle(fontSize: 24)),
                                 ),
                                 const SizedBox(height: 4),
                                 const Text('-2.1% compared to last month', style: TextStyle(color: Colors.red, fontSize: 12)),
@@ -190,7 +190,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                      side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
@@ -299,7 +299,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                      side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
@@ -333,7 +333,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               final recent = payments.take(5).toList();
                               if (recent.isEmpty) return const Text('No transactions yet.');
                               return DataTable(
-                                headingRowColor: MaterialStateProperty.resolveWith((states) => Colors.grey.withOpacity(0.1)),
+                                headingRowColor: WidgetStateProperty.resolveWith((states) => Colors.grey.withValues(alpha: 0.1)),
                                 columns: const [
                                   DataColumn(label: Text('Date')),
                                   DataColumn(label: Text('Amount')),
@@ -352,7 +352,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               );
                             },
                             loading: () => const CircularProgressIndicator(),
-                            error: (_, __) => const Text('Error loading transactions'),
+                            error: (_, _) => const Text('Error loading transactions'),
                           )
                         ],
                       ),
@@ -372,7 +372,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                      side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),

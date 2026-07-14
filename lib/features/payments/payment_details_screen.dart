@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/model/payment.dart';
 import '../../util/printer_helper.dart';
-import '../../data/model/payment.dart';
 
 class PaymentDetailsScreen extends StatelessWidget {
   final Payment payment;
-  const PaymentDetailsScreen({Key? key, required this.payment}) : super(key: key);
+  const PaymentDetailsScreen({super.key, required this.payment});
 
   @override
   Widget build(BuildContext context) {

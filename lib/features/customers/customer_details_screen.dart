@@ -3,14 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/model/customer.dart';
 import '../../providers/providers.dart';
-import '../../data/model/scheme.dart';
-import '../schemes/scheme_details_screen.dart';
-import 'package:intl/intl.dart';
 
 class CustomerDetailsScreen extends ConsumerWidget {
   final Customer customer;
   
-  const CustomerDetailsScreen({Key? key, required this.customer}) : super(key: key);
+  const CustomerDetailsScreen({super.key, required this.customer});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

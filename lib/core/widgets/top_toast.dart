@@ -69,11 +69,11 @@ class _TopToastState extends State<TopToast> with SingleTickerProviderStateMixin
                 margin: const EdgeInsets.symmetric(horizontal: 24),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 decoration: BoxDecoration(
-                  color: widget.backgroundColor.withOpacity(0.9),
+                  color: widget.backgroundColor.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -105,7 +105,6 @@ Future<void> showTopToast(
   Duration duration = const Duration(seconds: 3),
 }) async {
   final overlay = Overlay.of(context);
-  if (overlay == null) return;
 
   final entry = OverlayEntry(
     builder: (_) => TopToast(

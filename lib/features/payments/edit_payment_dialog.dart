@@ -9,7 +9,7 @@ import '../../providers/providers.dart';
 class EditPaymentDialog extends ConsumerStatefulWidget {
   final Payment payment;
 
-  const EditPaymentDialog({Key? key, required this.payment}) : super(key: key);
+  const EditPaymentDialog({super.key, required this.payment});
 
   @override
   ConsumerState<EditPaymentDialog> createState() => _EditPaymentDialogState();
@@ -109,7 +109,7 @@ class _EditPaymentDialogState extends ConsumerState<EditPaymentDialog> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20),
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -194,7 +194,7 @@ class _EditPaymentDialogState extends ConsumerState<EditPaymentDialog> {
                             }
                           });
                         },
-                        selectedColor: primaryColor.withOpacity(0.2),
+                        selectedColor: primaryColor.withValues(alpha: 0.2),
                         labelStyle: TextStyle(
                           color: isSelected ? primaryColor : Colors.black87,
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,

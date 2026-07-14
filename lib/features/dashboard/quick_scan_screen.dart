@@ -3,7 +3,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:go_router/go_router.dart';
 
 class QuickScanScreen extends StatefulWidget {
-  const QuickScanScreen({Key? key}) : super(key: key);
+  const QuickScanScreen({super.key});
 
   @override
   State<QuickScanScreen> createState() => _QuickScanScreenState();

@@ -5,11 +5,10 @@ import '../../data/model/scheme.dart';
 import '../../data/model/payment.dart';
 import '../../data/model/payment_mode.dart';
 import '../../providers/providers.dart';
-import '../schemes/scheme_details_screen.dart';
 
 class AddPaymentDialog extends ConsumerStatefulWidget {
   final Scheme scheme;
-  const AddPaymentDialog({Key? key, required this.scheme}) : super(key: key);
+  const AddPaymentDialog({super.key, required this.scheme});
 
   @override
   ConsumerState<AddPaymentDialog> createState() => _AddPaymentDialogState();
@@ -102,7 +101,7 @@ class _AddPaymentDialogState extends ConsumerState<AddPaymentDialog> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<PaymentMode>(
-                value: _selectedMode,
+                initialValue: _selectedMode,
                 decoration: const InputDecoration(labelText: 'Payment Mode', border: OutlineInputBorder()),
                 items: PaymentMode.values.map((mode) {
                   return DropdownMenuItem(

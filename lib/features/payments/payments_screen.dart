@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../providers/providers.dart';
 import '../../data/model/payment.dart';
@@ -8,7 +7,7 @@ import 'edit_payment_dialog.dart';
 import 'delete_payment_dialog.dart';
 
 class PaymentsScreen extends ConsumerStatefulWidget {
-  const PaymentsScreen({Key? key}) : super(key: key);
+  const PaymentsScreen({super.key});
 
   @override
   ConsumerState<PaymentsScreen> createState() => _PaymentsScreenState();

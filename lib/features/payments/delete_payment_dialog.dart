@@ -8,7 +8,7 @@ import '../../providers/providers.dart';
 class DeletePaymentDialog extends ConsumerStatefulWidget {
   final Payment payment;
 
-  const DeletePaymentDialog({Key? key, required this.payment}) : super(key: key);
+  const DeletePaymentDialog({super.key, required this.payment});
 
   @override
   ConsumerState<DeletePaymentDialog> createState() => _DeletePaymentDialogState();
@@ -74,7 +74,7 @@ class _DeletePaymentDialogState extends ConsumerState<DeletePaymentDialog> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(

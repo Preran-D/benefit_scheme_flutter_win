@@ -8,7 +8,7 @@ class AddCustomerDialog extends ConsumerStatefulWidget {
   /// When non-null, the dialog operates in "edit" mode.
   final Customer? editingCustomer;
 
-  const AddCustomerDialog({Key? key, this.editingCustomer}) : super(key: key);
+  const AddCustomerDialog({super.key, this.editingCustomer});
 
   @override
   ConsumerState<AddCustomerDialog> createState() => _AddCustomerDialogState();
@@ -128,7 +128,7 @@ class _AddCustomerDialogState extends ConsumerState<AddCustomerDialog> {
             child: ListView.separated(
               shrinkWrap: true,
               itemCount: addresses.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
+              separatorBuilder: (_, _) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final address = addresses[index];
                 return ListTile(
