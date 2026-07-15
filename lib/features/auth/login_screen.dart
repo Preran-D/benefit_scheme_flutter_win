@@ -74,7 +74,10 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      await Supabase.instance.client.auth.signInWithOAuth(OAuthProvider.google);
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'http://localhost:3000',
+      );
     } on AuthException catch (e) {
       setState(() {
         _errorMessage = e.message;
