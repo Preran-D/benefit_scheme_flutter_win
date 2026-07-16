@@ -74,14 +74,8 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
     showDialog(
       context: context,
       builder: (ctx) => PaymentCartPanel(
-        onClearAll: () {
-          ref.read(cartProvider.notifier).clearCart();
-          Navigator.of(ctx).pop();
-        },
         onConfirm: () {
-          Navigator.of(
-            ctx,
-          ).pop(); // Cart handles the actual payment submission now
+          Navigator.of(ctx).pop();
         },
       ),
     );

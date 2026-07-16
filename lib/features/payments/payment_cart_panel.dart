@@ -1,17 +1,19 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../data/model/customer.dart';
 import '../../data/model/payment.dart';
 import '../../data/model/payment_mode.dart';
 import '../../providers/providers.dart';
 
 class PaymentCartPanel extends ConsumerStatefulWidget {
-  final VoidCallback onClearAll;
+  final bool isAutoOpened;
   final VoidCallback onConfirm;
 
   const PaymentCartPanel({
     super.key,
-    required this.onClearAll,
+    this.isAutoOpened = false,
     required this.onConfirm,
   });
 
@@ -24,6 +26,27 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
   DateTime _paymentDate = DateTime.now();
   final Set<PaymentMode> _selectedModes = {PaymentMode.cash};
   bool _isLoading = false;
+  
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  Timer? _autoCloseTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isAutoOpened) {
+      _autoCloseTimer = Timer(const Duration(seconds: 3), () {
+        if (mounted) Navigator.pop(context);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _autoCloseTimer?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
 
   Future<void> _selectDate() async {
     final picked = await showDatePicker(
@@ -121,10 +144,43 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header
+            // Header & Search
             if (_step == 0) ...[
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 20, 16, 16),
+                padding: const EdgeInsets.fromLTRB(24, 24, 16, 0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        autofocus: widget.isAutoOpened,
+                        decoration: InputDecoration(
+                          labelText: 'Search by Scheme Number or Customer Name',
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        ),
+                        onChanged: (value) {
+                          _autoCloseTimer?.cancel();
+                          setState(() {
+                            _searchQuery = value.trim().toLowerCase();
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                      tooltip: 'Close',
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 16, 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -132,11 +188,14 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
                       '${cartItems.length} Scheme${cartItems.length == 1 ? '' : 's'}  •  ₹${totalAmount.toStringAsFixed(0)}',
                       style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.black87),
                     ),
-                    TextButton(
-                      onPressed: widget.onClearAll,
-                      style: TextButton.styleFrom(foregroundColor: primaryColor),
-                      child: const Text('Clear All', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
+                    if (cartItems.isNotEmpty)
+                      TextButton(
+                        onPressed: () {
+                          ref.read(cartProvider.notifier).clearCart();
+                        },
+                        style: TextButton.styleFrom(foregroundColor: primaryColor),
+                        child: const Text('Clear All', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
                   ],
                 ),
               ),
@@ -155,11 +214,18 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
             // Body
             if (_step == 0) ...[
               Flexible(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: cartItems.length,
-                  itemBuilder: (context, index) => _buildCartItem(context, cartItems[index], ref),
-                ),
+                child: _searchQuery.isNotEmpty 
+                  ? _buildSearchResults(theme)
+                  : cartItems.isEmpty 
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32.0),
+                        child: Center(child: Text('Search and add schemes to proceed.', style: TextStyle(color: Colors.grey))),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: cartItems.length,
+                        itemBuilder: (context, index) => _buildCartItem(context, cartItems[index], ref),
+                      ),
               ),
             ] else ...[
               Padding(
@@ -320,6 +386,92 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
     );
   }
 
+  Widget _buildSearchResults(ThemeData theme) {
+    final schemesAsync = ref.watch(allSchemesProvider);
+    final customersAsync = ref.watch(customersProvider);
+
+    return schemesAsync.when(
+      data: (schemes) {
+        return customersAsync.when(
+          data: (customers) {
+            final activeSchemes = schemes.where((s) => (s.status ?? 'active').toLowerCase() == 'active').toList();
+            
+            final filteredSchemes = activeSchemes.where((scheme) {
+              if (_searchQuery.isEmpty) return false;
+              
+              final customer = customers.firstWhere(
+                (c) => c.id == scheme.customerId, 
+                orElse: () => Customer(name: 'Unknown')
+              );
+              
+              final schemeMatch = scheme.id.toString().contains(_searchQuery);
+              final customerMatch = customer.name.toLowerCase().contains(_searchQuery);
+              
+              return schemeMatch || customerMatch;
+            }).toList();
+
+            if (filteredSchemes.isEmpty) {
+              return const Center(child: Text('No active schemes found.', style: TextStyle(color: Colors.grey)));
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              itemCount: filteredSchemes.length,
+              itemBuilder: (context, index) {
+                final scheme = filteredSchemes[index];
+                final customer = customers.firstWhere(
+                  (c) => c.id == scheme.customerId, 
+                  orElse: () => Customer(name: 'Unknown')
+                );
+                
+                final isAlreadyInCart = ref.read(cartProvider).any((item) => item.scheme.id == scheme.id);
+                
+                return Card(
+                  elevation: 1,
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                      child: Text('${scheme.id}', style: TextStyle(color: theme.colorScheme.primary)),
+                    ),
+                    title: Text(customer.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text('Monthly Amount: ₹${scheme.monthlyAmount.toStringAsFixed(0)}'),
+                    trailing: isAlreadyInCart
+                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        : ElevatedButton.icon(
+                            onPressed: () {
+                              _autoCloseTimer?.cancel();
+                              ref.read(cartProvider.notifier).addScheme(customer, scheme);
+                              setState(() {
+                                _searchQuery = '';
+                                _searchController.clear();
+                              });
+                            },
+                            icon: const Icon(Icons.add, size: 16),
+                            label: const Text('Add'),
+                          ),
+                    onTap: isAlreadyInCart ? null : () {
+                      _autoCloseTimer?.cancel();
+                      ref.read(cartProvider.notifier).addScheme(customer, scheme);
+                      setState(() {
+                        _searchQuery = '';
+                        _searchController.clear();
+                      });
+                    },
+                  ),
+                );
+              },
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, st) => Center(child: Text('Error: $e')),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, st) => Center(child: Text('Error: $e')),
+    );
+  }
+
   Widget _buildCartItem(BuildContext context, CartItem item, WidgetRef ref) {
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
@@ -388,9 +540,6 @@ class _PaymentCartPanelState extends ConsumerState<PaymentCartPanel> {
                 GestureDetector(
                   onTap: () {
                     ref.read(cartProvider.notifier).removeScheme(item.scheme.id!);
-                    if (ref.read(cartProvider).isEmpty) {
-                      widget.onClearAll();
-                    }
                   },
                   child: Container(
                     width: 32,

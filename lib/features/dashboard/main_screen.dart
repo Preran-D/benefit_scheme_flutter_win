@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import '../../services/printer/printer_service.dart';
 import '../../providers/providers.dart';
 import '../../services/update_service.dart';
+import '../payments/payment_cart_panel.dart';
 
 class NewPaymentIntent extends Intent {
   const NewPaymentIntent();
@@ -22,7 +23,14 @@ class _NewPaymentAction extends Action<NewPaymentIntent> {
 
   @override
   Object? invoke(NewPaymentIntent intent) {
-    context.push('/add_payment_shortcut');
+    showDialog(
+      context: context,
+      builder: (context) => PaymentCartPanel(
+        onConfirm: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
     return null;
   }
 }
@@ -41,11 +49,25 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Timer? _onlineTimer;
   bool _hasUpdate = false;
   bool _wasReachable = false;
+  bool _isHoveringFab = false;
 
   @override
   void initState() {
     super.initState();
     _checkUpdates();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => PaymentCartPanel(
+            isAutoOpened: true,
+            onConfirm: () {
+              Navigator.pop(context);
+            },
+          ),
+        );
+      }
+    });
   }
 
   Future<void> _checkUpdates() async {
@@ -122,6 +144,25 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       },
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        floatingActionButton: MouseRegion(
+          onEnter: (_) => setState(() => _isHoveringFab = true),
+          onExit: (_) => setState(() => _isHoveringFab = false),
+          child: FloatingActionButton.extended(
+            onPressed: () {
+               showDialog(
+                 context: context,
+                 builder: (context) => PaymentCartPanel(
+                   onConfirm: () {
+                     Navigator.pop(context);
+                   },
+                 ),
+               );
+            },
+            icon: const Icon(Icons.add),
+            label: const Text('Record'),
+            isExtended: _isHoveringFab,
+          ),
+        ),
         body: Column(
           children: [
             // Top Navigation Bar (Glassmorphism)
