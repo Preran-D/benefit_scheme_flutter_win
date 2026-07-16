@@ -105,8 +105,11 @@ del "%~f0"
 ''';
       await batFile.writeAsString(batContent);
 
-      // Execute the script
-      Process.run('cmd', ['/c', 'start', '/min', batFile.path]);
+      // Execute the script as Administrator using PowerShell to bypass Program Files restrictions
+      Process.run('powershell', [
+        '-Command',
+        'Start-Process', 'cmd', '-ArgumentList', '"/c \\"${batFile.path}\\""', '-Verb', 'RunAs', '-WindowStyle', 'Hidden'
+      ]);
 
       // Exit the app so files can be overwritten
       exit(0);
