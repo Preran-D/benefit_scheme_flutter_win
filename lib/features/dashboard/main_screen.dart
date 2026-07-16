@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 
 import '../../services/printer/printer_service.dart';
 import '../../providers/providers.dart';
+import '../../services/update_service.dart';
 
 class NewPaymentIntent extends Intent {
   const NewPaymentIntent();
@@ -38,10 +39,25 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   bool _manualConnecting = false;
   bool _showOnlineText = true;
   Timer? _onlineTimer;
-  final bool _hasUpdate = true; // Placeholder for updates
+  bool _hasUpdate = false;
   bool _wasReachable = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _checkUpdates();
+  }
 
+  Future<void> _checkUpdates() async {
+    try {
+      final updateInfo = await UpdateService.checkForUpdate();
+      if (updateInfo != null && mounted) {
+        setState(() => _hasUpdate = true);
+      }
+    } catch (e) {
+      debugPrint('Update check failed: $e');
+    }
+  }
   @override
   void dispose() {
     _onlineTimer?.cancel();
@@ -220,7 +236,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                 children: [
                                   Badge(
                                     isLabelVisible: _hasUpdate,
-                                    child: Icon(Icons.system_update, color: primaryColor, size: 20),
+                                    child: Icon(Icons.system_update_alt_rounded, color: primaryColor, size: 20),
                                   ),
                                   const SizedBox(width: 12),
                                   const Text('Check for Updates'),
@@ -241,7 +257,64 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                           ],
                           onSelected: (value) async {
                             if (value == 'update') {
-                              // check for updates logic
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => const AlertDialog(
+                                  content: Row(
+                                    children: [
+                                      CircularProgressIndicator(),
+                                      SizedBox(width: 20),
+                                      Text('Checking for updates...'),
+                                    ],
+                                  ),
+                                ),
+                              );
+
+                              final updateInfo = await UpdateService.checkForUpdate();
+                              if (context.mounted) Navigator.pop(context); // close dialog
+
+                              if (updateInfo != null && context.mounted) {
+                                final bool? shouldUpdate = await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Update Available'),
+                                    content: Text('Version ${updateInfo['version']} is available. Do you want to download and install it now?'),
+                                    actions: [
+                                      TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Later')),
+                                      ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Update Now')),
+                                    ],
+                                  ),
+                                );
+
+                                if (shouldUpdate == true && context.mounted) {
+                                  // Show progress dialog
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (context) => const AlertDialog(
+                                      content: Row(
+                                        children: [
+                                          CircularProgressIndicator(),
+                                          SizedBox(width: 20),
+                                          Text('Downloading update... Please wait.'),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+
+                                  try {
+                                    await UpdateService.downloadAndInstallUpdate(updateInfo['url']!, (progress) {});
+                                  } catch (e) {
+                                    if (context.mounted) {
+                                      Navigator.pop(context); // close progress dialog
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update: $e')));
+                                    }
+                                  }
+                                }
+                              } else if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('You are already on the latest version!')));
+                              }
                             } else if (value == 'logout') {
                               await Supabase.instance.client.auth.signOut();
                               if (context.mounted) {
