@@ -89,7 +89,10 @@ final _router = GoRouter(
         ),
         GoRoute(
           path: '/customers',
-          pageBuilder: (context, state) => const NoTransitionPage(child: CustomersScreen()),
+          pageBuilder: (context, state) {
+            final view = state.uri.queryParameters['view'] ?? 'list';
+            return NoTransitionPage(child: CustomersScreen(view: view));
+          },
         ),
         GoRoute(
           path: '/printers',
@@ -97,7 +100,10 @@ final _router = GoRouter(
         ),
         GoRoute(
           path: '/payments',
-          pageBuilder: (context, state) => const NoTransitionPage(child: PaymentsScreen()),
+          pageBuilder: (context, state) {
+            final view = state.uri.queryParameters['view'] ?? 'daily';
+            return NoTransitionPage(child: PaymentsScreen(view: view));
+          },
         ),
       ],
     ),

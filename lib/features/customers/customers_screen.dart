@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../data/model/customer.dart';
 import '../../data/model/scheme.dart';
@@ -23,7 +24,8 @@ class CustomerItem extends ListItem {
 }
 
 class CustomersScreen extends ConsumerStatefulWidget {
-  const CustomersScreen({super.key});
+  final String view;
+  const CustomersScreen({super.key, this.view = 'list'});
 
   @override
   ConsumerState<CustomersScreen> createState() => _CustomersScreenState();
@@ -83,88 +85,18 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: Colors.transparent, // Inherit from MainScreen
-        body: Builder(
-          builder: (context) {
-            return Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0),
-                    child: Container(
-                      height: 48,
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withValues(alpha: 0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: TabBar(
-                        isScrollable: true,
-                        tabAlignment: TabAlignment.start,
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        indicator: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.15),
-                        ),
-                        labelColor: Theme.of(context).colorScheme.primary,
-                        unselectedLabelColor: Colors.grey[600],
-                        labelStyle: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                        unselectedLabelStyle: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                        ),
-                        dividerColor: Colors.transparent,
-                        splashBorderRadius: BorderRadius.circular(20),
-                        tabs: const [
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 24.0),
-                            child: Tab(text: 'Customers'),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 24.0),
-                            child: Tab(text: 'Summary'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      _buildMainCustomersView(),
-                      _SummaryTab(
-                        onCustomerSelected: (customer) {
-                          setState(() {
-                            _selectedCustomer = customer;
-                          });
-                          DefaultTabController.of(context).animateTo(0);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
+    return Scaffold(
+      backgroundColor: Colors.transparent, // Inherit from MainScreen
+      body: widget.view == 'summary'
+          ? _SummaryTab(
+              onCustomerSelected: (customer) {
+                setState(() {
+                  _selectedCustomer = customer;
+                });
+                context.go('/customers?view=list');
+              },
+            )
+          : _buildMainCustomersView(),
     );
   }
 
@@ -180,49 +112,79 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
           children: [
             // Header Row with Title, Search, and Add Button
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 300,
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search customers...',
-                          prefixIcon: const Icon(
-                            Icons.search,
-                            color: Colors.grey,
-                            size: 20,
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(22),
-                            borderSide: BorderSide(color: Colors.grey[200]!),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(22),
-                            borderSide: BorderSide(color: Colors.grey[200]!),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 0,
-                            horizontal: 16,
-                          ),
-                        ),
-                        onChanged: (val) => setState(() => _searchQuery = val),
+                SizedBox(
+                  width: 450,
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search customers...',
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(22),
+                        borderSide: BorderSide(color: Colors.grey[200]!),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(22),
+                        borderSide: BorderSide(color: Colors.grey[200]!),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 0,
+                        horizontal: 16,
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    if (_selectedAddresses.isNotEmpty)
+                    onChanged: (val) => setState(() => _searchQuery = val),
+                  ),
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (_selectedAddresses.isNotEmpty)
+                        ElevatedButton.icon(
+                          onPressed: _bulkAddPay,
+                          icon: const Icon(Icons.payment, size: 18),
+                          label: Text(
+                            'Add Pay (${_selectedAddresses.length})',
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.lightGreen,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 18,
+                            ),
+                          ),
+                        ),
+                      if (_selectedAddresses.isNotEmpty)
+                        const SizedBox(width: 16),
                       ElevatedButton.icon(
-                        onPressed: _bulkAddPay,
-                        icon: const Icon(Icons.payment, size: 18),
-                        label: Text(
-                          'Add Pay (${_selectedAddresses.length})',
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        onPressed: () {
+                          Future.delayed(Duration.zero, () {
+                            if (!mounted) return;
+                            showDialog(
+                              context: context,
+                              builder: (_) => const AddCustomerDialog(),
+                            );
+                          });
+                        },
+                        icon: const Icon(Icons.person_add, size: 18),
+                        label: const Text(
+                          'Add Customer',
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.lightGreen,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -234,37 +196,8 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                           ),
                         ),
                       ),
-                    if (_selectedAddresses.isNotEmpty)
-                      const SizedBox(width: 16),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Future.delayed(Duration.zero, () {
-                          if (!mounted) return;
-                          showDialog(
-                            context: context,
-                            builder: (_) => const AddCustomerDialog(),
-                          );
-                        });
-                      },
-                      icon: const Icon(Icons.person_add, size: 18),
-                      label: const Text(
-                        'Add Customer',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(22),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 18,
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
