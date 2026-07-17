@@ -95,11 +95,25 @@ class UpdateService {
       final batFile = File('${tempDir.path}\\update_app.bat');
       final batContent = '''
 @echo off
-echo Waiting for the app to close...
-ping 127.0.0.1 -n 3 > nul
-echo Updating files...
-xcopy /s /e /y "${extractDir.path}\\*" "$currentAppDir\\"
-echo Restarting app...
+setlocal
+set "retries=0"
+echo Waiting for app to close... > "%temp%\\benefit_update_log.txt"
+
+:retry
+ping 127.0.0.1 -n 2 > nul
+xcopy /s /e /y "${extractDir.path}\\*" "$currentAppDir\\" >> "%temp%\\benefit_update_log.txt" 2>&1
+if %errorlevel% equ 0 goto success
+set /a retries+=1
+if %retries% geq 15 goto fail
+echo File locked, retrying... >> "%temp%\\benefit_update_log.txt"
+goto retry
+
+:fail
+echo Update failed after multiple retries. >> "%temp%\\benefit_update_log.txt"
+exit
+
+:success
+echo Starting app... >> "%temp%\\benefit_update_log.txt"
 start "" "$currentExePath"
 del "%~f0"
 ''';
