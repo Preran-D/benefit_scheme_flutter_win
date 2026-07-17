@@ -121,8 +121,11 @@ del "%~f0"
   }
 
   static bool _isNewerVersion(String current, String latest) {
-    final currentParts = current.split('.').map((e) => int.tryParse(e) ?? 0).toList();
-    final latestParts = latest.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final currentClean = current.split('+').first;
+    final latestClean = latest.split('+').first;
+    
+    final currentParts = currentClean.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final latestParts = latestClean.split('.').map((e) => int.tryParse(e) ?? 0).toList();
     
     for (int i = 0; i < 3; i++) {
       final currPart = i < currentParts.length ? currentParts[i] : 0;
