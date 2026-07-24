@@ -9,13 +9,11 @@ import '../../providers/providers.dart';
 class ConfirmPaymentDialog extends ConsumerStatefulWidget {
   final List<CartItem> items;
 
-  const ConfirmPaymentDialog({
-    super.key,
-    required this.items,
-  });
+  const ConfirmPaymentDialog({super.key, required this.items});
 
   @override
-  ConsumerState<ConfirmPaymentDialog> createState() => _ConfirmPaymentDialogState();
+  ConsumerState<ConfirmPaymentDialog> createState() =>
+      _ConfirmPaymentDialogState();
 }
 
 class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
@@ -46,27 +44,50 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
       // Pre-validation: ensure schemes are not closed/completed
       await ref.read(syncControllerProvider.notifier).syncNow();
       for (final item in widget.items) {
-        final schemes = await ref.read(customerSchemesProvider(item.scheme.customerId).future);
-        final freshScheme = schemes.firstWhere((s) => s.id == item.scheme.id, orElse: () => item.scheme);
+        final schemes = await ref.read(
+          customerSchemesProvider(item.scheme.customerId).future,
+        );
+        final freshScheme = schemes.firstWhere(
+          (s) => s.id == item.scheme.id,
+          orElse: () => item.scheme,
+        );
         final status = (freshScheme.status ?? 'active').toLowerCase();
         if (status == 'closed' || status == 'completed') {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cannot process payment: Scheme #${item.scheme.id} is already $status.')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Cannot process payment: Scheme #${item.scheme.id} is already $status.',
+                ),
+              ),
+            );
           }
           return;
         }
-        
-        final newTotalPaid = (freshScheme.totalPaid ?? 0.0) + (item.scheme.monthlyAmount * item.months);
+
+        final newTotalPaid =
+            (freshScheme.totalPaid ?? 0.0) +
+            (item.scheme.monthlyAmount * item.months);
         if (newTotalPaid > (item.scheme.monthlyAmount * 12)) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cannot process payment: Scheme #${item.scheme.id} cannot exceed 12 months of payments.')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Cannot process payment: Scheme #${item.scheme.id} cannot exceed 12 months of payments.',
+                ),
+              ),
+            );
           }
           return;
         }
-        
+
         if (item.scheme.monthlyAmount <= 0) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cannot process payment: Invalid amount.')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Cannot process payment: Invalid amount.'),
+              ),
+            );
           }
           return;
         }
@@ -75,7 +96,7 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
       final repo = ref.read(paymentRepositoryProvider);
       final schemeRepo = ref.read(schemeRepositoryProvider);
       Payment? lastSavedPayment;
-      
+
       for (final item in widget.items) {
         final monthlyAmount = item.scheme.monthlyAmount;
         for (int i = 1; i <= item.months; i++) {
@@ -91,26 +112,29 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
 
           lastSavedPayment = await repo.addPayment(newPayment);
         }
-        
-        final newTotalPaid = (item.scheme.totalPaid ?? 0.0) + (monthlyAmount * item.months);
+
+        final newTotalPaid =
+            (item.scheme.totalPaid ?? 0.0) + (monthlyAmount * item.months);
         final isCompleted = newTotalPaid >= (monthlyAmount * 12);
-        
+
         await schemeRepo.updateSchemeTotals(
-          item.scheme.id!, 
-          newTotalPaid, 
-          _paymentDate.toIso8601String()
+          item.scheme.id!,
+          newTotalPaid,
+          _paymentDate.toIso8601String(),
         );
-        
+
         if (isCompleted && item.scheme.status != 'completed') {
           await schemeRepo.updateSchemeStatus(
-            item.scheme.id!, 
-            'completed', 
-            closedDate: DateTime.now().toIso8601String()
+            item.scheme.id!,
+            'completed',
+            closedDate: DateTime.now().toIso8601String(),
           );
         }
       }
-      
-      await ref.read(syncControllerProvider.notifier).syncNow(); // Post-sync everything
+
+      await ref
+          .read(syncControllerProvider.notifier)
+          .syncNow(); // Post-sync everything
       ref.read(cartProvider.notifier).clearCart();
 
       if (mounted) {
@@ -118,7 +142,9 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) {
@@ -153,7 +179,7 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            
+
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20),
               decoration: BoxDecoration(
@@ -164,7 +190,10 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
                 children: [
                   Text(
                     'Total Amount',
-                    style: TextStyle(color: primaryColor, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -197,11 +226,22 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Payment Date', style: TextStyle(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w600)),
+                        Text(
+                          'Payment Date',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         const SizedBox(height: 4),
                         Text(
                           DateFormat('dd MMM yyyy').format(_paymentDate),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
                         ),
                       ],
                     ),
@@ -214,7 +254,11 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
             // Payment Mode Title
             const Text(
               'Payment Mode',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Colors.black87,
+              ),
             ),
             const SizedBox(height: 12),
 
@@ -227,11 +271,26 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
               ),
               child: Row(
                 children: [
-                  _buildModeOption('Cash', Icons.currency_rupee, PaymentMode.cash, Colors.green),
+                  _buildModeOption(
+                    'Cash',
+                    Icons.currency_rupee,
+                    PaymentMode.cash,
+                    Colors.green,
+                  ),
                   _buildVerticalDivider(),
-                  _buildModeOption('Upi', Icons.g_mobiledata, PaymentMode.upi, Colors.blue),
+                  _buildModeOption(
+                    'Upi',
+                    Icons.g_mobiledata,
+                    PaymentMode.upi,
+                    Colors.blue,
+                  ),
                   _buildVerticalDivider(),
-                  _buildModeOption('Card', Icons.credit_card, PaymentMode.card, Colors.red),
+                  _buildModeOption(
+                    'Card',
+                    Icons.credit_card,
+                    PaymentMode.card,
+                    Colors.red,
+                  ),
                 ],
               ),
             ),
@@ -247,8 +306,22 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Total Payable', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16)),
-                  Text('₹${widget.items.fold(0.0, (sum, item) => sum + (item.scheme.monthlyAmount * item.months)).toStringAsFixed(0)}', style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 24)),
+                  const Text(
+                    'Total Payable',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    '₹${widget.items.fold(0.0, (sum, item) => sum + (item.scheme.monthlyAmount * item.months)).toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -266,9 +339,22 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
                 ),
                 elevation: 0,
               ),
-              child: _isLoading 
-                ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : Text('Confirm ₹${widget.items.fold(0.0, (sum, item) => sum + (item.scheme.monthlyAmount * item.months)).toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      'Confirm ₹${widget.items.fold(0.0, (sum, item) => sum + (item.scheme.monthlyAmount * item.months)).toStringAsFixed(0)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
             ),
           ],
         ),
@@ -277,14 +363,15 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
   }
 
   Widget _buildVerticalDivider() {
-    return Container(
-      width: 1,
-      height: 40,
-      color: Colors.grey[300],
-    );
+    return Container(width: 1, height: 40, color: Colors.grey[300]);
   }
 
-  Widget _buildModeOption(String label, IconData icon, PaymentMode mode, Color iconColor) {
+  Widget _buildModeOption(
+    String label,
+    IconData icon,
+    PaymentMode mode,
+    Color iconColor,
+  ) {
     final isSelected = _selectedMode == mode;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
@@ -296,22 +383,34 @@ class _ConfirmPaymentDialogState extends ConsumerState<ConfirmPaymentDialog> {
           });
         },
         borderRadius: BorderRadius.horizontal(
-          left: mode == PaymentMode.cash ? const Radius.circular(24) : Radius.zero,
-          right: mode == PaymentMode.card ? const Radius.circular(24) : Radius.zero,
+          left: mode == PaymentMode.cash
+              ? const Radius.circular(24)
+              : Radius.zero,
+          right: mode == PaymentMode.card
+              ? const Radius.circular(24)
+              : Radius.zero,
         ),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
             color: isSelected ? primaryColor : Colors.white,
             borderRadius: BorderRadius.horizontal(
-              left: mode == PaymentMode.cash ? const Radius.circular(24) : Radius.zero,
-              right: mode == PaymentMode.card ? const Radius.circular(24) : Radius.zero,
+              left: mode == PaymentMode.cash
+                  ? const Radius.circular(24)
+                  : Radius.zero,
+              right: mode == PaymentMode.card
+                  ? const Radius.circular(24)
+                  : Radius.zero,
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 20, color: isSelected ? Colors.white : iconColor),
+              Icon(
+                icon,
+                size: 20,
+                color: isSelected ? Colors.white : iconColor,
+              ),
               const SizedBox(width: 8),
               Text(
                 label,

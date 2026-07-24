@@ -36,7 +36,9 @@ class _AddPaymentDialogState extends ConsumerState<AddPaymentDialog> {
 
   Future<void> _processPayment() async {
     if (_formKey.currentState!.validate()) {
-      setState(() { _isLoading = true; });
+      setState(() {
+        _isLoading = true;
+      });
 
       final amount = double.parse(_amountController.text);
       final newPayment = Payment(
@@ -52,25 +54,39 @@ class _AddPaymentDialogState extends ConsumerState<AddPaymentDialog> {
       try {
         // Pre-validation: ensure scheme is not closed/completed
         await ref.read(syncControllerProvider.notifier).syncNow();
-        final schemes = await ref.read(customerSchemesProvider(widget.scheme.customerId).future);
-        final freshScheme = schemes.firstWhere((s) => s.id == widget.scheme.id, orElse: () => widget.scheme);
+        final schemes = await ref.read(
+          customerSchemesProvider(widget.scheme.customerId).future,
+        );
+        final freshScheme = schemes.firstWhere(
+          (s) => s.id == widget.scheme.id,
+          orElse: () => widget.scheme,
+        );
         final status = (freshScheme.status ?? 'active').toLowerCase();
         if (status == 'closed' || status == 'completed') {
-          if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cannot process payment: Scheme is already $status.')));
+          if (mounted)
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Cannot process payment: Scheme is already $status.',
+                ),
+              ),
+            );
           return;
         }
 
         final repo = ref.read(paymentRepositoryProvider);
         final savedPayment = await repo.addPayment(newPayment);
-        
+
         await ref.read(syncControllerProvider.notifier).syncNow(); // Post-sync
-        
+
         if (mounted) {
           context.pop(savedPayment);
         }
       } finally {
         if (mounted) {
-          setState(() { _isLoading = false; });
+          setState(() {
+            _isLoading = false;
+          });
         }
       }
     }
@@ -87,11 +103,17 @@ class _AddPaymentDialogState extends ConsumerState<AddPaymentDialog> {
           child: ListView(
             shrinkWrap: true,
             children: [
-              Text('Scheme ID: ${widget.scheme.id}', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Scheme ID: ${widget.scheme.id}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(labelText: 'Amount (₹)', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Amount (₹)',
+                  border: OutlineInputBorder(),
+                ),
                 keyboardType: TextInputType.number,
                 validator: (val) {
                   if (val == null || val.isEmpty) return 'Required';
@@ -102,7 +124,10 @@ class _AddPaymentDialogState extends ConsumerState<AddPaymentDialog> {
               const SizedBox(height: 16),
               DropdownButtonFormField<PaymentMode>(
                 initialValue: _selectedMode,
-                decoration: const InputDecoration(labelText: 'Payment Mode', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Payment Mode',
+                  border: OutlineInputBorder(),
+                ),
                 items: PaymentMode.values.map((mode) {
                   return DropdownMenuItem(
                     value: mode,
@@ -111,14 +136,19 @@ class _AddPaymentDialogState extends ConsumerState<AddPaymentDialog> {
                 }).toList(),
                 onChanged: (val) {
                   if (val != null) {
-                    setState(() { _selectedMode = val; });
+                    setState(() {
+                      _selectedMode = val;
+                    });
                   }
                 },
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _notesController,
-                decoration: const InputDecoration(labelText: 'Notes (Optional)', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Notes (Optional)',
+                  border: OutlineInputBorder(),
+                ),
                 maxLines: 2,
               ),
             ],
@@ -132,12 +162,18 @@ class _AddPaymentDialogState extends ConsumerState<AddPaymentDialog> {
         ),
         ElevatedButton.icon(
           onPressed: _isLoading ? null : _processPayment,
-          icon: _isLoading ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.payment),
+          icon: _isLoading
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.payment),
           label: const Text('Confirm Payment'),
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           ),
-        )
+        ),
       ],
     );
   }

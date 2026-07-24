@@ -184,7 +184,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -1003,109 +1005,112 @@ class _CustomerSchemesPanelState extends ConsumerState<_CustomerSchemesPanel> {
               if (_isTableView) {
                 return LayoutBuilder(
                   builder: (context, constraints) {
-                    final tableWidth = constraints.maxWidth > 800 ? constraints.maxWidth : 800.0;
+                    final tableWidth = constraints.maxWidth > 800
+                        ? constraints.maxWidth
+                        : 800.0;
                     return SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: SizedBox(
                         width: tableWidth,
                         child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0,
-                        vertical: 8.0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24.0,
+                            vertical: 8.0,
+                          ),
+                          itemCount: filteredSchemes.length + 1,
+                          separatorBuilder: (context, index) => index == 0
+                              ? const SizedBox(height: 0)
+                              : Divider(height: 1, color: Colors.grey[200]),
+                          itemBuilder: (context, index) {
+                            if (index == 0) {
+                              return Container(
+                                color: Colors.grey[800],
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        'SL',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        'Scheme',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        'Started',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        'Total Paid',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        'Status',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 4,
+                                      child: Text(
+                                        'Actions',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        textAlign: TextAlign.right,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                            final scheme = filteredSchemes[index - 1];
+                            return _SchemeTableRow(
+                              index: index,
+                              scheme: scheme,
+                              customer: widget.customer,
+                              onRecordPaymentRequested: () =>
+                                  widget.onRecordPaymentRequested(scheme),
+                            );
+                          },
+                        ),
                       ),
-                      itemCount: filteredSchemes.length + 1,
-                      separatorBuilder: (context, index) => index == 0
-                          ? const SizedBox(height: 0)
-                          : Divider(height: 1, color: Colors.grey[200]),
-                      itemBuilder: (context, index) {
-                        if (index == 0) {
-                          return Container(
-                            color: Colors.grey[800],
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    'SL',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    'Scheme',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    'Started',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    'Total Paid',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    'Status',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Text(
-                                    'Actions',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.right,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                        final scheme = filteredSchemes[index - 1];
-                        return _SchemeTableRow(
-                          index: index,
-                          scheme: scheme,
-                          customer: widget.customer,
-                          onRecordPaymentRequested: () =>
-                              widget.onRecordPaymentRequested(scheme),
-                        );
-                      },
-                    ),
-                  ),
+                    );
+                  },
                 );
-              });
-            }
+              }
 
               final activeSchemes = filteredSchemes
                   .where(
@@ -1979,7 +1984,9 @@ class _SchemeActionsRow extends ConsumerWidget {
             if (!isClosedOrCompleted) ...[
               _SchemeActionButton(
                 icon: Icons.add_card_rounded,
-                label: iconOnly ? null : (paymentCount == 0 ? 'Add First Payment' : 'Pay'),
+                label: iconOnly
+                    ? null
+                    : (paymentCount == 0 ? 'Add First Payment' : 'Pay'),
                 color: primaryColor,
                 onTap: () async {
                   // Pre-validation

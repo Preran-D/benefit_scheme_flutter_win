@@ -26,7 +26,9 @@ class Scheme {
       id: map['id'] as int?,
       customerId: map['customer_id'] as int? ?? 0,
       monthlyAmount: (map['monthly_amount'] as num?)?.toDouble() ?? 0.0,
-      totalPaid: map['total_paid'] != null ? (map['total_paid'] as num).toDouble() : 0.0,
+      totalPaid: map['total_paid'] != null
+          ? (map['total_paid'] as num).toDouble()
+          : 0.0,
       lastPaymentDate: map['last_payment_date'] as String?,
       status: map['status'] as String? ?? "active",
       notes: map['notes'] as String?,

@@ -398,6 +398,17 @@ class $SchemesTable extends Schemes
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _closedMonthsMeta = const VerificationMeta(
+    'closedMonths',
+  );
+  @override
+  late final GeneratedColumn<int> closedMonths = GeneratedColumn<int>(
+    'closed_months',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -419,6 +430,7 @@ class $SchemesTable extends Schemes
     status,
     notes,
     closedDate,
+    closedMonths,
     createdAt,
   ];
   @override
@@ -488,6 +500,15 @@ class $SchemesTable extends Schemes
         closedDate.isAcceptableOrUnknown(data['closed_date']!, _closedDateMeta),
       );
     }
+    if (data.containsKey('closed_months')) {
+      context.handle(
+        _closedMonthsMeta,
+        closedMonths.isAcceptableOrUnknown(
+          data['closed_months']!,
+          _closedMonthsMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -535,6 +556,10 @@ class $SchemesTable extends Schemes
         DriftSqlType.string,
         data['${effectivePrefix}closed_date'],
       ),
+      closedMonths: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}closed_months'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}created_at'],
@@ -557,6 +582,7 @@ class SchemeEntity extends DataClass implements Insertable<SchemeEntity> {
   final String status;
   final String? notes;
   final String? closedDate;
+  final int? closedMonths;
   final String? createdAt;
   const SchemeEntity({
     required this.id,
@@ -567,6 +593,7 @@ class SchemeEntity extends DataClass implements Insertable<SchemeEntity> {
     required this.status,
     this.notes,
     this.closedDate,
+    this.closedMonths,
     this.createdAt,
   });
   @override
@@ -585,6 +612,9 @@ class SchemeEntity extends DataClass implements Insertable<SchemeEntity> {
     }
     if (!nullToAbsent || closedDate != null) {
       map['closed_date'] = Variable<String>(closedDate);
+    }
+    if (!nullToAbsent || closedMonths != null) {
+      map['closed_months'] = Variable<int>(closedMonths);
     }
     if (!nullToAbsent || createdAt != null) {
       map['created_at'] = Variable<String>(createdAt);
@@ -608,6 +638,9 @@ class SchemeEntity extends DataClass implements Insertable<SchemeEntity> {
       closedDate: closedDate == null && nullToAbsent
           ? const Value.absent()
           : Value(closedDate),
+      closedMonths: closedMonths == null && nullToAbsent
+          ? const Value.absent()
+          : Value(closedMonths),
       createdAt: createdAt == null && nullToAbsent
           ? const Value.absent()
           : Value(createdAt),
@@ -628,6 +661,7 @@ class SchemeEntity extends DataClass implements Insertable<SchemeEntity> {
       status: serializer.fromJson<String>(json['status']),
       notes: serializer.fromJson<String?>(json['notes']),
       closedDate: serializer.fromJson<String?>(json['closedDate']),
+      closedMonths: serializer.fromJson<int?>(json['closedMonths']),
       createdAt: serializer.fromJson<String?>(json['createdAt']),
     );
   }
@@ -643,6 +677,7 @@ class SchemeEntity extends DataClass implements Insertable<SchemeEntity> {
       'status': serializer.toJson<String>(status),
       'notes': serializer.toJson<String?>(notes),
       'closedDate': serializer.toJson<String?>(closedDate),
+      'closedMonths': serializer.toJson<int?>(closedMonths),
       'createdAt': serializer.toJson<String?>(createdAt),
     };
   }
@@ -656,6 +691,7 @@ class SchemeEntity extends DataClass implements Insertable<SchemeEntity> {
     String? status,
     Value<String?> notes = const Value.absent(),
     Value<String?> closedDate = const Value.absent(),
+    Value<int?> closedMonths = const Value.absent(),
     Value<String?> createdAt = const Value.absent(),
   }) => SchemeEntity(
     id: id ?? this.id,
@@ -668,6 +704,7 @@ class SchemeEntity extends DataClass implements Insertable<SchemeEntity> {
     status: status ?? this.status,
     notes: notes.present ? notes.value : this.notes,
     closedDate: closedDate.present ? closedDate.value : this.closedDate,
+    closedMonths: closedMonths.present ? closedMonths.value : this.closedMonths,
     createdAt: createdAt.present ? createdAt.value : this.createdAt,
   );
   SchemeEntity copyWithCompanion(SchemesCompanion data) {
@@ -688,6 +725,9 @@ class SchemeEntity extends DataClass implements Insertable<SchemeEntity> {
       closedDate: data.closedDate.present
           ? data.closedDate.value
           : this.closedDate,
+      closedMonths: data.closedMonths.present
+          ? data.closedMonths.value
+          : this.closedMonths,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -703,6 +743,7 @@ class SchemeEntity extends DataClass implements Insertable<SchemeEntity> {
           ..write('status: $status, ')
           ..write('notes: $notes, ')
           ..write('closedDate: $closedDate, ')
+          ..write('closedMonths: $closedMonths, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -718,6 +759,7 @@ class SchemeEntity extends DataClass implements Insertable<SchemeEntity> {
     status,
     notes,
     closedDate,
+    closedMonths,
     createdAt,
   );
   @override
@@ -732,6 +774,7 @@ class SchemeEntity extends DataClass implements Insertable<SchemeEntity> {
           other.status == this.status &&
           other.notes == this.notes &&
           other.closedDate == this.closedDate &&
+          other.closedMonths == this.closedMonths &&
           other.createdAt == this.createdAt);
 }
 
@@ -744,6 +787,7 @@ class SchemesCompanion extends UpdateCompanion<SchemeEntity> {
   final Value<String> status;
   final Value<String?> notes;
   final Value<String?> closedDate;
+  final Value<int?> closedMonths;
   final Value<String?> createdAt;
   const SchemesCompanion({
     this.id = const Value.absent(),
@@ -754,6 +798,7 @@ class SchemesCompanion extends UpdateCompanion<SchemeEntity> {
     this.status = const Value.absent(),
     this.notes = const Value.absent(),
     this.closedDate = const Value.absent(),
+    this.closedMonths = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   SchemesCompanion.insert({
@@ -765,6 +810,7 @@ class SchemesCompanion extends UpdateCompanion<SchemeEntity> {
     this.status = const Value.absent(),
     this.notes = const Value.absent(),
     this.closedDate = const Value.absent(),
+    this.closedMonths = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : customerId = Value(customerId),
        monthlyAmount = Value(monthlyAmount);
@@ -777,6 +823,7 @@ class SchemesCompanion extends UpdateCompanion<SchemeEntity> {
     Expression<String>? status,
     Expression<String>? notes,
     Expression<String>? closedDate,
+    Expression<int>? closedMonths,
     Expression<String>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -788,6 +835,7 @@ class SchemesCompanion extends UpdateCompanion<SchemeEntity> {
       if (status != null) 'status': status,
       if (notes != null) 'notes': notes,
       if (closedDate != null) 'closed_date': closedDate,
+      if (closedMonths != null) 'closed_months': closedMonths,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -801,6 +849,7 @@ class SchemesCompanion extends UpdateCompanion<SchemeEntity> {
     Value<String>? status,
     Value<String?>? notes,
     Value<String?>? closedDate,
+    Value<int?>? closedMonths,
     Value<String?>? createdAt,
   }) {
     return SchemesCompanion(
@@ -812,6 +861,7 @@ class SchemesCompanion extends UpdateCompanion<SchemeEntity> {
       status: status ?? this.status,
       notes: notes ?? this.notes,
       closedDate: closedDate ?? this.closedDate,
+      closedMonths: closedMonths ?? this.closedMonths,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -843,6 +893,9 @@ class SchemesCompanion extends UpdateCompanion<SchemeEntity> {
     if (closedDate.present) {
       map['closed_date'] = Variable<String>(closedDate.value);
     }
+    if (closedMonths.present) {
+      map['closed_months'] = Variable<int>(closedMonths.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<String>(createdAt.value);
     }
@@ -860,6 +913,7 @@ class SchemesCompanion extends UpdateCompanion<SchemeEntity> {
           ..write('status: $status, ')
           ..write('notes: $notes, ')
           ..write('closedDate: $closedDate, ')
+          ..write('closedMonths: $closedMonths, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -1680,6 +1734,7 @@ typedef $$SchemesTableCreateCompanionBuilder =
       Value<String> status,
       Value<String?> notes,
       Value<String?> closedDate,
+      Value<int?> closedMonths,
       Value<String?> createdAt,
     });
 typedef $$SchemesTableUpdateCompanionBuilder =
@@ -1692,6 +1747,7 @@ typedef $$SchemesTableUpdateCompanionBuilder =
       Value<String> status,
       Value<String?> notes,
       Value<String?> closedDate,
+      Value<int?> closedMonths,
       Value<String?> createdAt,
     });
 
@@ -1776,6 +1832,11 @@ class $$SchemesTableFilterComposer
 
   ColumnFilters<String> get closedDate => $composableBuilder(
     column: $table.closedDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get closedMonths => $composableBuilder(
+    column: $table.closedMonths,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1877,6 +1938,11 @@ class $$SchemesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get closedMonths => $composableBuilder(
+    column: $table.closedMonths,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -1939,6 +2005,11 @@ class $$SchemesTableAnnotationComposer
 
   GeneratedColumn<String> get closedDate => $composableBuilder(
     column: $table.closedDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get closedMonths => $composableBuilder(
+    column: $table.closedMonths,
     builder: (column) => column,
   );
 
@@ -2030,6 +2101,7 @@ class $$SchemesTableTableManager
                 Value<String> status = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<String?> closedDate = const Value.absent(),
+                Value<int?> closedMonths = const Value.absent(),
                 Value<String?> createdAt = const Value.absent(),
               }) => SchemesCompanion(
                 id: id,
@@ -2040,6 +2112,7 @@ class $$SchemesTableTableManager
                 status: status,
                 notes: notes,
                 closedDate: closedDate,
+                closedMonths: closedMonths,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -2052,6 +2125,7 @@ class $$SchemesTableTableManager
                 Value<String> status = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<String?> closedDate = const Value.absent(),
+                Value<int?> closedMonths = const Value.absent(),
                 Value<String?> createdAt = const Value.absent(),
               }) => SchemesCompanion.insert(
                 id: id,
@@ -2062,6 +2136,7 @@ class $$SchemesTableTableManager
                 status: status,
                 notes: notes,
                 closedDate: closedDate,
+                closedMonths: closedMonths,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0

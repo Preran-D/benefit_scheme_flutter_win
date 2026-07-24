@@ -9,7 +9,10 @@ class SchemeRepository {
 
   Future<List<Scheme>> getSchemesForCustomer(int customerId) async {
     try {
-      final response = await _supabase.from('schemes').select().eq('customer_id', customerId);
+      final response = await _supabase
+          .from('schemes')
+          .select()
+          .eq('customer_id', customerId);
       return response.map((json) => Scheme.fromMap(json)).toList();
     } catch (e) {
       debugPrint('Scheme Fetch Error: $e');
@@ -31,10 +34,14 @@ class SchemeRepository {
     try {
       final insertMap = scheme.toMap();
       insertMap.remove('id');
-      
-      final response = await _supabase.from('schemes').insert(insertMap).select().single();
+
+      final response = await _supabase
+          .from('schemes')
+          .insert(insertMap)
+          .select()
+          .single();
       finalScheme = Scheme.fromMap(response);
-      
+
       await _dbHelper.insertScheme(finalScheme);
     } catch (e) {
       debugPrint('Supabase addScheme error: $e');
@@ -54,14 +61,19 @@ class SchemeRepository {
     return finalScheme;
   }
 
-  Future<void> updateSchemeStatus(int schemeId, String status, {String? closedDate, bool clearClosedDate = false}) async {
+  Future<void> updateSchemeStatus(
+    int schemeId,
+    String status, {
+    String? closedDate,
+    bool clearClosedDate = false,
+  }) async {
     final Map<String, dynamic> updateData = {'status': status};
     if (clearClosedDate) {
       updateData['closed_date'] = null;
     } else if (closedDate != null) {
       updateData['closed_date'] = closedDate;
     }
-    
+
     try {
       await _supabase.from('schemes').update(updateData).eq('id', schemeId);
     } catch (e) {
@@ -69,7 +81,11 @@ class SchemeRepository {
       rethrow;
     }
     try {
-      await _dbHelper.updateSchemeStatus(schemeId, status, closedDate: closedDate);
+      await _dbHelper.updateSchemeStatus(
+        schemeId,
+        status,
+        closedDate: closedDate,
+      );
     } catch (_) {}
   }
 
@@ -84,12 +100,16 @@ class SchemeRepository {
     } catch (_) {}
   }
 
-  Future<void> updateScheme(int schemeId, double monthlyAmount, String createdAt) async {
+  Future<void> updateScheme(
+    int schemeId,
+    double monthlyAmount,
+    String createdAt,
+  ) async {
     try {
-      await _supabase.from('schemes').update({
-        'monthly_amount': monthlyAmount,
-        'created_at': createdAt,
-      }).eq('id', schemeId);
+      await _supabase
+          .from('schemes')
+          .update({'monthly_amount': monthlyAmount, 'created_at': createdAt})
+          .eq('id', schemeId);
     } catch (e) {
       debugPrint('Update scheme error: $e');
     }
@@ -98,12 +118,19 @@ class SchemeRepository {
     } catch (_) {}
   }
 
-  Future<void> updateSchemeTotals(int schemeId, double newTotalPaid, String lastPaymentDate) async {
+  Future<void> updateSchemeTotals(
+    int schemeId,
+    double newTotalPaid,
+    String lastPaymentDate,
+  ) async {
     try {
-      await _supabase.from('schemes').update({
-        'total_paid': newTotalPaid,
-        'last_payment_date': lastPaymentDate,
-      }).eq('id', schemeId);
+      await _supabase
+          .from('schemes')
+          .update({
+            'total_paid': newTotalPaid,
+            'last_payment_date': lastPaymentDate,
+          })
+          .eq('id', schemeId);
     } catch (e) {
       debugPrint('Update scheme totals error: $e');
     }
